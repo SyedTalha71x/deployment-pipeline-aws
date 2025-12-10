@@ -1,0 +1,63 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20  
+      
+  pre_build:
+    commands:
+      - echo "Starting CI/CD build process..."
+      - echo "Current directory: $(pwd)"
+      - ls -la
+      
+  build:
+    commands:
+      - echo "Building React client..."
+      - cd client
+      - npm ci
+      - echo "Running React build..."
+      - npm run build
+      - echo "React build complete"
+      - ls -la dist/
+      
+      - echo "Preparing Node.js server..."
+      - cd ../server
+      - npm ci --only=production
+      - echo "Server dependencies installed"
+      
+  post_build:
+    commands:
+      - echo "Organizing deployment artifacts..."
+      
+      - mkdir -p artifact
+      - cd artifact
+      
+      - echo "Copying React dist folder..."
+      - cp -r ../client/dist/ .
+      - echo "Dist folder contents:"
+      - ls -la dist/
+      
+      - echo "Copying server source..."
+      - mkdir -p server
+      - cp -r ../server/* server/
+      - rm -rf server/node_modules
+      - echo "Server folder contents:"
+      - ls -la server/
+      
+      - echo "Copying deployment scripts..."
+      - mkdir -p scripts
+      - cp -r ../scripts/* scripts/
+      - chmod +x scripts/*.sh
+      - echo "Scripts folder contents:"
+      - ls -la scripts/
+      
+      # Show final artifact structure
+      - echo "Final artifact structure:"
+      - find . -type f | sort
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: artifact
+  discard-paths: no

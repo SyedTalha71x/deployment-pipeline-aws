@@ -1,0 +1,33 @@
+version: 0.0
+os: linux
+files:
+  - source: dist/
+    destination: /home/ubuntu/lummilo-app/client
+  
+  - source: server/
+    destination: /home/ubuntu/lummilo-app/server
+  
+  - source: scripts/
+    destination: /home/ubuntu/lummilo-app/scripts
+
+hooks:
+  ApplicationStop:
+    - location: scripts/application_stop.sh
+      timeout: 300
+      runas: ubuntu
+  BeforeInstall:
+    - location: scripts/before_install.sh
+      timeout: 300
+      runas: ubuntu
+  AfterInstall:
+    - location: scripts/after_install.sh
+      timeout: 300
+      runas: ubuntu
+  ApplicationStart:
+    - location: scripts/application_start.sh
+      timeout: 300
+      runas: ubuntu
+  ValidateService:
+    - location: scripts/validate_service.sh
+      timeout: 300
+      runas: ubuntu
